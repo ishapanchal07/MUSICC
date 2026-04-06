@@ -20,6 +20,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSession(session);
       setUser(session?.user || null);
       setLoading(false);
+    }).catch(error => {
+      console.warn("Failed to fetch session, likely a network or placeholder URL issue:", error.message);
+      setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
