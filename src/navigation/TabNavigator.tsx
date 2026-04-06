@@ -5,11 +5,13 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import LibraryScreen from '../screens/LibraryScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 export type TabParamList = {
   Home: undefined;
   Search: undefined;
   Library: undefined;
+  Profile: undefined;
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -23,6 +25,7 @@ export default function TabNavigator() {
           if (route.name === 'Home') iconName = focused ? 'home' : 'home-outline';
           else if (route.name === 'Search') iconName = focused ? 'search' : 'search-outline';
           else if (route.name === 'Library') iconName = focused ? 'library' : 'library-outline';
+          else if (route.name === 'Profile') iconName = focused ? 'person' : 'person-outline';
           
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -45,6 +48,7 @@ export default function TabNavigator() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Search" component={SearchScreen} />
       <Tab.Screen name="Library" component={LibraryScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
