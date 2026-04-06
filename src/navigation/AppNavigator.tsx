@@ -6,10 +6,12 @@ import TabNavigator from './TabNavigator';
 import PlayerScreen from '../screens/PlayerScreen';
 import MiniPlayer from '../components/MiniPlayer';
 import { usePlayer } from '../context/PlayerContext';
+import PlaylistScreen from '../screens/PlaylistScreen';
 
 export type RootStackParamList = {
   Main: undefined;
   Player: undefined;
+  Playlist: { playlistId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -33,6 +35,11 @@ export default function AppNavigator() {
       <View style={styles.container}>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Main" component={TabNavigator} />
+          <Stack.Screen 
+            name="Playlist" 
+            component={PlaylistScreen} 
+            options={{ animation: 'slide_from_right' }} 
+          />
           <Stack.Screen 
             name="Player" 
             component={PlayerScreen} 

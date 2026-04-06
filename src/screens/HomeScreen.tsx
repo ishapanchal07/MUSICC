@@ -1,23 +1,38 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Button } from 'react-native';
 import { usePlayer } from '../context/PlayerContext';
-import { MOCK_TRACKS, Track } from '../data/mockData';
+import { Track } from '../data/mockData';
+import { useLibrary } from '../context/LibraryContext';
+import { Ionicons } from '@expo/vector-icons';
+import AddToPlaylistModal from '../components/AddToPlaylistModal';
 
 export default function HomeScreen() {
   const { playTrack, currentTrack } = usePlayer();
+  const { localSongs, loadLocalMusic } = useLibrary();
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
+
+  useEffect(() => {
+    loadLocalMusic();
+  }, []);
 
   const renderItem = ({ item }: { item: Track }) => {
     const isPlaying = currentTrack?.id === item.id;
     return (
       <TouchableOpacity 
         style={styles.trackItem} 
-        onPress={() => playTrack(item, MOCK_TRACKS)}
+        onPress={() => playTrack(item, localSongs)}
       >
         <Image source={{ uri: item.artwork }} style={styles.artwork} />
         <View style={styles.trackInfo}>
-          <Text style={[styles.title, isPlaying && styles.playingTitle]}>{item.title}</Text>
-          <Text style={styles.artist}>{item.artist}</Text>
+          <Text style={[styles.title, isPlaying && styles.playingTitle]} numberOfLines={1}>{item.title}</Text>
+          <Text style={styles.artist} numberOfLines={1}>{item.artist}</Text>
         </View>
+        <Text style={styles.duration}>
+          {Math.floor(item.duration / 60)}:{(item.duration % 60).toString().padStart(2, '0')}
+        </Text>
+        <TouchableOpacity onPress={() => setSelectedTrack(item)} style={styles.addBtn}>
+          <Ionicons name="add-circle-outline" size={24} color="#1DB954" />
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   };
@@ -26,11 +41,18 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Text style={styles.header}>Good evening</Text>
       <FlatList
-        data={MOCK_TRACKS}
+        data={localSongs}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No local songs found.</Text>
+            <Button title="Load Local Music" onPress={loadLocalMusic} color="#1DB954" />
+          </View>
+        }
       />
+      <AddToPlaylistModal visible={!!selectedTrack} track={selectedTrack} onClose={() => setSelectedTrack(null)} />
     </View>
   );
 }
@@ -64,6 +86,8 @@ const styles = StyleSheet.create({
   trackInfo: {
     marginLeft: 16,
     justifyContent: 'center',
+    flex: 1,
+    marginRight: 10,
   },
   title: {
     color: '#fff',
@@ -77,5 +101,23 @@ const styles = StyleSheet.create({
   artist: {
     color: '#b3b3b3',
     fontSize: 14,
+  },
+  duration: {
+    color: '#b3b3b3',
+    fontSize: 14,
+    marginLeft: 'auto',
+  },
+  addBtn: {
+    padding: 8,
+    marginLeft: 8,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
+  },
+  emptyText: {
+    color: '#b3b3b3',
+    marginBottom: 20,
   },
 });
